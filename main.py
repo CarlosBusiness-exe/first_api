@@ -22,7 +22,7 @@ products = {
     }
 }
 
-#GET METHOD
+#GET METHOD - Read
 #Get all products
 @app.get("/products")
 async def get_products():
@@ -38,7 +38,7 @@ async def get_product(id: int): #Type hints because need be converted
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found.") #What will be returned(error not found with description)
 
 
-#POST METHOD
+#POST METHOD - Create
 #Create a new item
 #Have to be sent the parameters on the body of the request
 @app.post("/products" , status_code=status.HTTP_201_CREATED) #Using status code only to set the right status when create a element
@@ -53,6 +53,16 @@ async def post_product(product: Product): #Python hints of the model type
         return product
     else: #if it is already on the datas, raise a erro of conflict
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Already have a product with this id: {product.id}")"""
+    
+#PUT METHOD - Update
+@app.put("/products/{product_id}") #Passing the id of the product that will be deleted on the url
+async def put_products(product_id: int, product: Product):
+    if product_id in products: #Verifying if exist a product with this id
+        products[product_id] = product #If it exist, will update it
+        return product
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product Id not found.") #Rainsing a error mensage with was used a invalid id
+
 
 #Starting using only python command
 if __name__ == "__main__":
