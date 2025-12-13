@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi import HTTPException #To threat exceptions
 from fastapi import status #Pass the status code to be used on the threat
 
+from fastapi.responses import JSONResponse #Used to return a response in the delete method
+from fastapi import Response
+
 from models import Product #Using the model that was created
 
 app = FastAPI()
@@ -63,6 +66,15 @@ async def put_products(product_id: int, product: Product):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product Id not found.") #Rainsing a error mensage with was used a invalid id
 
+#DELETE METHOD - Delete
+@app.delete("/products/{product_id}") #Pass the id on the url
+async def delete_product(product_id: int):
+    if product_id in products: #If exist a element with this id
+        del products[product_id] #Delete it
+        #return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, detail="The product was deleted") #Returning a status code of JSON to a deleted content
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product id not found") #Raise a error if is not found
 
 #Starting using only python command
 if __name__ == "__main__":
