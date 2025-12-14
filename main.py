@@ -4,6 +4,7 @@ from fastapi import status #Pass the status code to be used on the threat
 
 from fastapi.responses import JSONResponse #Used to return a response in the delete method
 from fastapi import Response
+from fastapi import Path #To use path parameters
 
 from models import Product #Using the model that was created
 
@@ -33,7 +34,11 @@ async def get_products():
 
 #Get one product
 @app.get("/products/{id}") #In keys because is a variable(python)
-async def get_product(id: int): #Type hints because need be converted
+#Type hints, and using path parameter to describe the function and limit the values
+#gt- greater than, lt- lower than.
+#Descriptions appear on the /docs
+#The path parameter is used to set rules and a lot of things related with the path. Ctrl+click in Path to see all the things
+async def get_product(id: int = Path(default=None, title="Product ID", description="Have to be between 0 - 100", gt=0, lt=100)):
     try: #Try to find and return the product
         return products[id] #Returning the product
     #This will change, the server will not broke, only return the 404 error, and continue working
