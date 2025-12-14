@@ -3,6 +3,6 @@ from pydantic import BaseModel
 
 #Creating a base model using pydantic
 class Product(BaseModel):
-    id: Optional[int] = None #Set that id is not necessary be provided when will create a item
+    id: Optional[int] = None #Defining that the ID does not need to be provided when creating an item.
     name: str
     price: float
