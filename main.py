@@ -5,6 +5,8 @@ from fastapi import status #Pass the status code to be used on the threat
 from fastapi.responses import JSONResponse #Used to return a response in the delete method
 from fastapi import Response
 from fastapi import Path #To use path parameters
+from fastapi import Query
+from typing import List, Optional
 
 from models import Product #Using the model that was created
 
@@ -80,6 +82,25 @@ async def delete_product(product_id: int):
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product id not found") #Raise a error if is not found
+
+@app.get("/calculator")
+#Need to pass the arguments on the querys(after "?")
+#If I try to execute this by passing only the variables without specifying their type(python hints), the code will simply concatenate the "texts"
+#The GET url -> http://localhost:8000/calculator?a=10&b=2&c=21
+#Exemple of using a optional variable
+#I can pass rules to query, in the same way of paths
+async def calculator(a: int = Query(default=None, gt=0, lt=999), b: int = Query(default=None, gt=10, lt=999), c: int = Query(default=None, gt=0, lt=999), d: Optional[int] = None):
+    result = a + b + c
+    optional_result = result
+    if d:
+        optional_result = optional_result + d
+    return(f"Normal result: {result},Result with optional: {optional_result}")
+
+"""
+    Path Parameter: Used to specify WHO you want (which ID, which specific item).
+
+    Query Parameter: Used to specify HOW you want it (filtered, sorted, limited).
+"""
 
 #Starting using only python command
 if __name__ == "__main__":
