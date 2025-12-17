@@ -5,7 +5,8 @@ from fastapi import status #Pass the status code to be used on the threat
 from fastapi.responses import JSONResponse #Used to return a response in the delete method
 from fastapi import Response
 from fastapi import Path #To use path parameters
-from fastapi import Query
+from fastapi import Query #To use query parameters
+from fastapi import Header #To use header parameters
 from typing import List, Optional
 
 from models import Product #Using the model that was created
@@ -89,9 +90,13 @@ async def delete_product(product_id: int):
 #The GET url -> http://localhost:8000/calculator?a=10&b=2&c=21
 #Exemple of using a optional variable
 #I can pass rules to query, in the same way of paths
-async def calculator(a: int = Query(default=None, gt=0, lt=999), b: int = Query(default=None, gt=10, lt=999), c: int = Query(default=None, gt=0, lt=999), d: Optional[int] = None):
+async def calculator(a: int = Query(default=None, gt=0, lt=999), b: int = Query(default=None, gt=10, lt=999), x_header: str = Header(default=None), c: int = Query(default=None, gt=0, lt=999), d: Optional[int] = None):
     result = a + b + c
     optional_result = result
+
+    #To set header partameters, it has to be passed on the header area of the request
+    print(f"X_HEADER: {x_header}")
+
     if d:
         optional_result = optional_result + d
     return(f"Normal result: {result},Result with optional: {optional_result}")
