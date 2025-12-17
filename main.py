@@ -1,15 +1,35 @@
-from fastapi import FastAPI
-from fastapi import HTTPException #To threat exceptions
-from fastapi import status #Pass the status code to be used on the threat
+from typing import List, Optional, Any
 
 from fastapi.responses import JSONResponse #Used to return a response in the delete method
 from fastapi import Response
 from fastapi import Path #To use path parameters
 from fastapi import Query #To use query parameters
 from fastapi import Header #To use header parameters
-from typing import List, Optional
+
+from fastapi import FastAPI
+from fastapi import HTTPException #To threat exceptions
+from fastapi import status #Pass the status code to be used on the threat
+from fastapi import Depends #Used to inject dependences
+
+from time import sleep
 
 from models import Product #Using the model that was created
+
+"""
+    This code is fully commented because i used it 
+    to study FastAPI, and i write notes of the things 
+    to remeber how to do.
+"""
+
+#Creating a fake database only to use dependence injections
+#This function will be called when will acess the "database"
+def fake_db():
+    try:
+        print("Opening the database...")
+        sleep(1)
+    finally:
+        print("Closing the database...")
+        sleep(1)
 
 app = FastAPI()
 
@@ -32,7 +52,7 @@ products = {
 #GET METHOD - Read
 #Get all products
 @app.get("/products")
-async def get_products():
+async def get_products(db: Any = Depends(fake_db)):
     return products
 
 #Get one product
@@ -41,7 +61,7 @@ async def get_products():
 #gt- greater than, lt- lower than.
 #Descriptions appear on the /docs
 #The path parameter is used to set rules and a lot of things related with the path. Ctrl+click in Path to see all the things
-async def get_product(id: int = Path(default=None, title="Product ID", description="Have to be between 0 - 100", gt=0, lt=100)):
+async def get_product(id: int = Path(default=None, title="Product ID", description="Have to be between 0 - 100", gt=0, lt=100), db: Any = Depends(fake_db)):
     try: #Try to find and return the product
         return products[id] #Returning the product
     #This will change, the server will not broke, only return the 404 error, and continue working
@@ -53,7 +73,7 @@ async def get_product(id: int = Path(default=None, title="Product ID", descripti
 #Create a new item
 #Have to be sent the parameters on the body of the request
 @app.post("/products" , status_code=status.HTTP_201_CREATED) #Using status code only to set the right status when create a element
-async def post_product(product: Product): #Python hints of the model type
+async def post_product(product: Product, db: Any = Depends(fake_db)): #Python hints of the model type
     next_id: int = len(products) + 1 #Python hints to convert, get the size of products(last id) + 1
     products[next_id] = product #Set this new product on the position(on  the key-> next_id:dict)
     return product
@@ -67,7 +87,7 @@ async def post_product(product: Product): #Python hints of the model type
     
 #PUT METHOD - Update
 @app.put("/products/{product_id}") #Passing the id of the product that will be deleted on the url
-async def put_products(product_id: int, product: Product):
+async def put_products(product_id: int, product: Product, db: Any = Depends(fake_db)):
     if product_id in products: #Verifying if exist a product with this id
         products[product_id] = product #If it exist, will update it
         return product
@@ -76,7 +96,7 @@ async def put_products(product_id: int, product: Product):
 
 #DELETE METHOD - Delete
 @app.delete("/products/{product_id}") #Pass the id on the url
-async def delete_product(product_id: int):
+async def delete_product(product_id: int, db: Any = Depends(fake_db)):
     if product_id in products: #If exist a element with this id
         del products[product_id] #Delete it
         #return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, detail="The product was deleted") #Returning a status code of JSON to a deleted content
