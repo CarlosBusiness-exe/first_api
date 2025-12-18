@@ -41,7 +41,7 @@ app = FastAPI(
 #GET METHOD - Read
 #Get all products
 #This informations appear on the docs
-@app.get("/products", description="This function will return all the products, or a empty list", summary="Return products list", response_model=list[Product])
+@app.get("/products", description="This function will return all the products, or a empty list", summary="Return products list", response_model=list[Product], response_description="Products found successfully.")
 async def get_products(db: Any = Depends(fake_db)):
     return products
 
