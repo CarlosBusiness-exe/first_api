@@ -31,7 +31,11 @@ def fake_db():
         print("Closing the database...")
         sleep(1)
 
-app = FastAPI()
+app = FastAPI(
+    title="Carlos' first API",
+    description="Project to study purposes",
+    version="0.0.1"
+    )
 
 #Creating ditcs of dicts
 products = {
@@ -51,12 +55,13 @@ products = {
 
 #GET METHOD - Read
 #Get all products
-@app.get("/products")
+#This informations appear on the docs
+@app.get("/products", description="This function will return all the products, or a empty list", summary="Return products list", response_model=list[Product])
 async def get_products(db: Any = Depends(fake_db)):
     return products
 
 #Get one product
-@app.get("/products/{id}") #In keys because is a variable(python)
+@app.get("/products/{id}", response_model=Product) #In keys because is a variable(python)
 #Type hints, and using path parameter to describe the function and limit the values
 #gt- greater than, lt- lower than.
 #Descriptions appear on the /docs
