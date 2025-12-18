@@ -14,6 +14,7 @@ from fastapi import Depends #Used to inject dependences
 from time import sleep
 
 from models import Product #Using the model that was created
+from models import products
 
 """
     This code is fully commented because i used it 
@@ -36,22 +37,6 @@ app = FastAPI(
     description="Project to study purposes",
     version="0.0.1"
     )
-
-#Creating ditcs of dicts
-products = {
-    1:{
-        "name":"Rice",
-        "price":10.5
-    },
-    2:{
-        "name":"Bean",
-        "price":9.5
-    },
-    3:{
-        "name":"Meat",
-        "price":20.0
-    }
-}
 
 #GET METHOD - Read
 #Get all products
