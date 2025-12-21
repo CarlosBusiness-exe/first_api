@@ -42,7 +42,7 @@ app = FastAPI(
 #Get all products
 #This informations appear on the docs
 @app.get("/products", description="This function will return all the products, or a empty list", summary="Return products list", response_model=list[Product], response_description="Products found successfully.")
-async def get_products(db: Any = Depends(fake_db)):
+async def get_products():
     return products
 
 #Get one product
@@ -51,7 +51,7 @@ async def get_products(db: Any = Depends(fake_db)):
 #gt- greater than, lt- lower than.
 #Descriptions appear on the /docs
 #The path parameter is used to set rules and a lot of things related with the path. Ctrl+click in Path to see all the things
-async def get_product(id: int = Path(default=None, title="Product ID", description="Have to be between 0 - 100", gt=0, lt=100), db: Any = Depends(fake_db)):
+async def get_product(id: int = Path(default=None, title="Product ID", description="Have to be between 0 - 100", gt=0, lt=100)):
     try: #Try to find and return the product
         return products[id] #Returning the product
     #This will change, the server will not broke, only return the 404 error, and continue working
@@ -62,22 +62,17 @@ async def get_product(id: int = Path(default=None, title="Product ID", descripti
 #POST METHOD - Create
 #Create a new item
 #Have to be sent the parameters on the body of the request
-@app.post("/products" , status_code=status.HTTP_201_CREATED) #Using status code only to set the right status when create a element
-async def post_product(product: Product, db: Any = Depends(fake_db)): #Python hints of the model type
-    next_id: int = len(products) + 1 #Python hints to convert, get the size of products(last id) + 1
-    products[next_id] = product #Set this new product on the position(on  the key-> next_id:dict)
+@app.post("/products", status_code=status.HTTP_201_CREATED)
+async def post_product(product: Product):
+    next_id = max((p.id for p in products), default=0) + 1
+    product.id = next_id
+    
+    products.append(product)
     return product
-
-    """Manually validation
-    if product.id not in products:
-        products[product.id] = product
-        return product
-    else: #if it is already on the datas, raise a erro of conflict
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Already have a product with this id: {product.id}")"""
     
 #PUT METHOD - Update
 @app.put("/products/{product_id}") #Passing the id of the product that will be deleted on the url
-async def put_products(product_id: int, product: Product, db: Any = Depends(fake_db)):
+async def put_products(product_id: int, product: Product):
     if product_id in products: #Verifying if exist a product with this id
         products[product_id] = product #If it exist, will update it
         return product
@@ -86,7 +81,7 @@ async def put_products(product_id: int, product: Product, db: Any = Depends(fake
 
 #DELETE METHOD - Delete
 @app.delete("/products/{product_id}") #Pass the id on the url
-async def delete_product(product_id: int, db: Any = Depends(fake_db)):
+async def delete_product(product_id: int):
     if product_id in products: #If exist a element with this id
         del products[product_id] #Delete it
         #return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, detail="The product was deleted") #Returning a status code of JSON to a deleted content
